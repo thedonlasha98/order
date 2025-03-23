@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: order
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+  kafka:
+    bootstrap-servers: kafka:29092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: ge.croco.user
+        spring.json.user.type.headers: false
+    consumer:
+      group-id: order-app
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      properties:
+        spring.json.trusted.packages: ge.croco.user
+        spring.json.user.type.headers: false
+      auto-offset-reset: earliest
+  cache:
+    type: hazelcast
+
+
+logging:
+  level:
+    org:
+      apache:
+        kafka: OFF
+
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
+
+hazelcast:
+  cluster:
+    name: dev
+  network:
+    port: 5701
+    join:
+      tcp-ip:
+        enabled: true
+        members:
+          - 127.0.0.1
