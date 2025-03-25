@@ -343,13 +343,21 @@ public class OrderControllerIT {
         userEvent.setId(userId);
         kafkaTemplate.send("users", userId.toString(), userEvent).get(500, TimeUnit.MILLISECONDS);
 
+        Awaitility.await().atMost(1, TimeUnit.SECONDS).untilAsserted(() -> {
+            Integer orderCountAfter = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM orders WHERE user_id = ?", Integer.class, userId
+            );
+            assertThat(orderCountAfter).isEqualTo(0);
+        });
         List<Order> orders = orderRepository.findAll();
         Assertions.assertEquals(1, orders.size());
         boolean existsOrders = orders.stream()
                 .anyMatch(o -> o.getUserId().equals(userId));
         Assertions.assertFalse(existsOrders);
 
-        Cache cache = cacheManager.getCache(ORDER_CACHE);
-        Assertions.assertNull(cache);
+        assertThat(cacheManager.getCache(ORDER_CACHE).get(order3.getOrderId())).isNull();
+        assertThat(cacheManager.getCache(ORDER_CACHE).get(order.getOrderId())).isNull();
+
+
     }
 }
