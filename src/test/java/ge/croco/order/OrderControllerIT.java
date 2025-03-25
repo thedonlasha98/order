@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -37,7 +36,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -152,6 +150,7 @@ public class OrderControllerIT {
     }
 
     @Test
+    @org.junit.jupiter.api.Order(1)
     public void createOrder_success() throws Exception {
         OrderRequest orderRequest = new OrderRequest(
                 UUID.randomUUID().toString(),
@@ -200,6 +199,7 @@ public class OrderControllerIT {
     }
 
     @Test
+    @org.junit.jupiter.api.Order(2)
     public void getOrderByOwner_returnOrder_forOther_FORBIDDEN() throws Exception {
         OrderRequest orderRequest = new OrderRequest(
                 UUID.randomUUID().toString(),
@@ -244,6 +244,7 @@ public class OrderControllerIT {
     }
 
     @Test
+    @org.junit.jupiter.api.Order(3)
     public void updateOrderByADMIN_changedStatusToCONFIRMED() throws Exception {
         OrderRequest orderRequest = new OrderRequest(
                 UUID.randomUUID().toString(),
@@ -301,6 +302,7 @@ public class OrderControllerIT {
     }
 
     @Test
+    @org.junit.jupiter.api.Order(4)
     public void receiveUserDeletedEvent_shouldDeleteAllUserOrders() throws ExecutionException, InterruptedException, TimeoutException {
         Long userId = 1L;
         OrderRequest orderRequest = new OrderRequest(
