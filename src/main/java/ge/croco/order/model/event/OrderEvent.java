@@ -11,6 +11,7 @@ import java.time.Instant;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(callSuper = true)
 public class OrderEvent extends OrderDetails {
     private EventType eventType;
     private Instant timestamp;

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,18 +29,21 @@ public class OrderController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<OrderDetails> getOrders(Pageable pageable) {
         return orderService.getOrders(pageable);
     }
 
     @GetMapping("/{orderId}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN') or @orderPermissionEvaluator.isOwner(authentication, #orderId)")
     public OrderDetails getOrder(@PathVariable String orderId) {
         return orderService.getOrder(orderId);
     }
 
     @PutMapping("/{orderId}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN') or @orderPermissionEvaluator.isOwner(authentication, #orderId)")
     public OrderDetails updateOrder(@PathVariable String orderId,
                                     @RequestBody @Valid UpdateOrderRequest orderRequest) {
         return orderService.updateOrder(orderId, orderRequest);
@@ -47,6 +51,7 @@ public class OrderController {
 
     @DeleteMapping("/{orderId}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN') or @orderPermissionEvaluator.isOwner(authentication, #orderId)")
     public void deleteOrder(@PathVariable String orderId) {
         orderService.deleteOrder(orderId);
     }

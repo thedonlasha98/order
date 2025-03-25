@@ -19,8 +19,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-//    private final CustomUserDetailsService userDetailsService;
-
     private final JwtTokenUtil jwtTokenUtil;
 
     @Override
@@ -43,7 +41,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(
                                 claims.getSubject(),
-                                null,
+                                claims,
                                 jwtTokenUtil.extractAuthorities(token)
                         );
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

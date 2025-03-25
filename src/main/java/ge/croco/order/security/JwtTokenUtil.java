@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenUtil {
 
-    @Value("${JWT_SECRET_KEY}")
+    @Value("${jwt.secret.key}")
     private String secretKey;
 
     public static Claims extractAllClaims(String token, String secretKey) {
@@ -60,7 +60,7 @@ public class JwtTokenUtil {
         return extractAllClaims(token).getExpiration();
     }
 
-    private static Key getSigningKey(String secretKey) {
+    public static Key getSigningKey(String secretKey) {
         return Keys.hmacShaKeyFor(java.util.Base64.getDecoder().decode(secretKey));
     }
 

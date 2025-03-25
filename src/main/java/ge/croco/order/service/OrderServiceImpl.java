@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -50,6 +51,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Order order = OrderMapper.toEntity(orderRequest);
+        order.setUserId(userId);
         order.setOrderId(UUID.randomUUID().toString());
         order.setExpirationDate(order.getCreatedAt().plusSeconds(orderRequest.ttl()));
         order.setTotalPrice(orderRequest.price().multiply(new BigDecimal(orderRequest.quantity())));
@@ -125,6 +127,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void deleteByUserId(Long userId) {
         orderRepository.deleteAllByUserId(userId);
         Optional.ofNullable(cacheManager.getCache(ORDER_CACHE))
@@ -138,7 +141,7 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("Sending order event: {}", orderEvent);
         try {
-            kafkaTemplate.send("orders", eventType.name(), order).get(30, TimeUnit.SECONDS);
+            kafkaTemplate.send("orders", eventType.name(), orderEvent).get(30, TimeUnit.SECONDS);
         } catch (Exception ex) {
             log.warn("Failed to send order event: {}", orderEvent, ex);
         }
